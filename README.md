@@ -1,4 +1,4 @@
-# CO-Kafka
+# Simple Confluent Kafka with docker-compose
 
 This is an example app of how setup and use kafka.
 
@@ -6,16 +6,31 @@ The docker-compose provide access to the following services:
 
 * Zookeeper: port 2181
 * Kafka: port 9092
-* Schema Registry: port 8081
-* Kafka Rest: port 8082
-* Kafka Manager: port 9000
 
-## Configuration
+## Configuration
 
-To access direct to kafka from the host machine is required to add the following hostname to `/etc/hosts`
+To access kafka broker from other docker containers it is required to create a common network:
 
 ```
-127.0.0.1       broker
+docker network create confluent_kafka
+```
+
+Each consumer/produce container must join this network. It can be set in docker-compose.yml with:
+
+
+```
+services:
+  <service_name>:
+    ...
+    networks:
+      - default
+      - confluent_kafka
+    ...
+
+networks:
+  default: {}
+  confluent_kafka:
+    external: true
 ```
 
 ## Start Docker
@@ -24,31 +39,34 @@ To access direct to kafka from the host machine is required to add the following
 docker-compose up -d
 ```
 
-Access to docker with node:
+Access to the broker container to execute kafka cli commands
 ```
-docker exec -it cokafka_app_1 node
-```
-
-Access to the broker container
-```
-docker exec -it cokafka_broker_1 /bin/bash
-```
-
-## Producer Example
-```
-node src/simple-producer.js
-```
-## Consumer Example
-```
-node src/simple-consumer.js
+docker-compose exec kafka bash
 ```
 
 ## Kafka CLI Examples
+
+Create a new topic
 ```
-kafka-console-consumer --topic test --bootstrap-server broker:9092 --group test-group
+kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic collections
 ```
 
-Alter partition number in topic 
+List all topics
 ```
-kafka-topics  --alter --partitions 2 --topic test --zookeeper zookeeper:2181
+kafka-topics --list --zookeeper zookeeper:2181
+```
+
+Subscribe to a topic trough the terminal
+```
+kafka-console-consumer --bootstrap-server kafka:9092 --topic collections
+```
+
+Produce to a topic trough the terminal
+```
+kafka-console-producer --broker-list kafka:9092 --topic collections
+```
+
+Alter partition number in topic
+```
+kafka-topics --alter --partitions 2 --topic collections --zookeeper zookeeper:2181
 ```
