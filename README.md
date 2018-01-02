@@ -33,6 +33,10 @@ networks:
     external: true
 ```
 
+Example: [collections-plan-service/docker-compose.yml](https://github.com/comparaonline/collections-plan-service/blob/aa55e0481072e43f95394b8accee756c0d0f73b7/docker-compose.yml)
+
+Also, if using `event-streamer`, add this config: [collections-plan-service/config/default.json](https://github.com/comparaonline/collections-plan-service/blob/aa55e0481072e43f95394b8accee756c0d0f73b7/config/default.json#L10)
+
 ## Start Docker
 
 ```
