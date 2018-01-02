@@ -46,6 +46,7 @@ docker-compose exec kafka bash
 
 ## Kafka CLI Examples
 
+### Topics
 Create a new topic
 ```
 kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic collections
@@ -56,21 +57,23 @@ List all topics
 kafka-topics --list --zookeeper zookeeper:2181
 ```
 
-Subscribe to a topic trough the terminal
+Alter partition number in topic
+```
+kafka-topics --alter --partitions 2 --topic collections --zookeeper zookeeper:2181
+```
+
+### Consumer
+Subscribe to a topic trough the terminal, all events will be printed
 ```
 kafka-console-consumer --bootstrap-server kafka:9092 --topic collections
 ```
 
+### Producer
 Produce to a topic trough the terminal
 ```
 kafka-console-producer --broker-list kafka:9092 --topic collections
 ```
-then in the terminal paste JSON event
+then in the terminal paste the JSON event:
 ```
 > {"code": "StartChargeFeesEvent"}
-```
-
-Alter partition number in topic
-```
-kafka-topics --alter --partitions 2 --topic collections --zookeeper zookeeper:2181
 ```
