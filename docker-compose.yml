@@ -1,33 +1,20 @@
 version: '3.3'
 services:
-  app:
-    build:
-      context: .
-      args:
-        ENVIRONMENT: development
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - '.:/code'
-      # mount modules from image
-      - '/code/node_modules'
-    ports:
-      - '4000:4000'
-    depends_on:
-      - broker
-  
+
   zookeeper:
     image: confluentinc/cp-zookeeper
-    hostname: zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zk-data:/var/lib/zookeeper/data
+      - zk-txn-logs:/var/lib/zookeeper/log
+      - secrets:/etc/zookeeper/secrets
 
   broker:
     image: confluentinc/cp-kafka
-    hostname: broker
     depends_on:
       - zookeeper
     ports:
@@ -44,19 +31,23 @@ services:
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    volumes:
+     - kafka-data:/var/lib/kafka/data
+     - secrets:/etc/kafka/secrets
 
-  schema_registry:
+  schema-registry:
     image: confluentinc/cp-schema-registry
-    hostname: schema_registry
     depends_on:
       - zookeeper
       - broker
     ports:
       - '8081:8081'
     environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema_registry
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-  
+    volumes:
+      - secrets:/etc/schema-registry/secrets
+
   kafka-manager:
     image: sheepkiller/kafka-manager:latest
     ports:
@@ -71,7 +62,6 @@ services:
 
   kafka-rest:
     image: confluentinc/cp-kafka-rest
-    container_name: kafka-rest
     depends_on:
       - zookeeper
       - broker
@@ -82,3 +72,9 @@ services:
       KAFKA_REST_LISTENERS: http://kafka-rest:8082
       KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KAFKA_REST_HOST_NAME: kafka-rest
+
+volumes:
+  zk-data: {}
+  zk-txn-logs: {}
+  kafka-data: {}
+  secrets: {}
