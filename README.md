@@ -65,6 +65,10 @@ Produce to a topic trough the terminal
 ```
 kafka-console-producer --broker-list kafka:9092 --topic collections
 ```
+then in the terminal paste JSON event
+```
+> {"code": "StartChargeFeesEvent"}
+```
 
 Alter partition number in topic
 ```
