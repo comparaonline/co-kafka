@@ -1,6 +1,0 @@
-{
-  "sequelize": {
-    "database": "collections-ledger-service-test",
-    "logging": false
-  }
-}
